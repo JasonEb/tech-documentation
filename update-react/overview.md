@@ -23,7 +23,7 @@ App.js routes
 
 
 # Class
-Shifting from Component  to 
+Shifting from 
 
 # React Components
 Navbar
@@ -34,3 +34,10 @@ Protected
 
 References
 https://blog.carbonfive.com/replacing-component-lifecycle-methods-with-react-hooks/
+
+## Prework
+- seeds file
+- auth
+    - bcrypt demonstration
+    - auth flow
+    - protecting routes on frontend
