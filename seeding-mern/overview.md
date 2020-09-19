@@ -18,12 +18,16 @@ Article about setting up a seeds file that generate dummy data using faker.js. T
 ## Purpose
 - article sets up future article with MERN stack
 - for other developers looking to setup with mongoatlas
+- EXACTLY for nested reference approaches.
+    - why use nested references?
+    - compare subdocuments approach 
 
 ## Goals
 - [ ] Demonstrate related objects seeding with mongodb
 - [ ] demonstrate the idea of keys, potentially a discriminator
 - [ ] examine async behavior with interacting with the mongodb
 - [ ] demonstrate setting up mongoatlas
+- [ ] demonstrate inserting with nested references
 
 
 ## References

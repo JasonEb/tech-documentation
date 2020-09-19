@@ -34,3 +34,6 @@
 ## Follow-Up Topics
 - Auth FLow
 - API Routes
+- Estimating Data Size
+    - Parsing feed data costs
+    - Using seed file to estimate limit
