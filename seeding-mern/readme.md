@@ -60,6 +60,7 @@ mongoose
     conn.connection.db.dropDatabase(
       console.log(`${conn.connection.db.databaseName} database cleared.`)
     );
+    // disable for seed data to persist
 
     let users = [];
 
@@ -71,13 +72,21 @@ mongoose
         password: "abc123",
       };
       users.push(newUser);
-    }   
-
+    }  
+ 
+    User.insertMany(users).then ( () => mongoose.connection.close() )
   })
   .catch((err) => console.log(err));
 ```
 
-Note the addition of `ObjectId`. Although ids are generated when it's processed by the database, 
+Note that the MongoDB connection must remain active. A naive implementation would have the final calls be
+```javascript
+User.insertMany(users)
+mongoose.connection.close()
+```
+But these are asynchronous functions executed consecutively, and thus mongoose will close the connection before the `insertMany` could interact with the database. Considering these are promises, the calls can be chained. 
+
+Note the addition of `ObjectId`. Although ids are generated when it's processed to the database, MongoDB will accept explicit id's as well. This is enabled by importing `ObjectId`, which will accept a string and assign a `_id` value. This will be useful when creating associated `Posts` with a nested reference. 
 
 ## Seed File
 ```javascript
