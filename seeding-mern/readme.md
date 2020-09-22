@@ -29,6 +29,7 @@ The issue with seeding is respecting the MongoDB behavior when interacting with 
 The `seed.js` file is a plain javascript script, and it will be executed with `node` in the command line. The most important aspect is connecting to the MongoDB database and performing the seeding while the connection is alive.
 
 ```javascript
+const mongoose = require("mongoose");
 let db = 'yourMongAtlasURL`
 
 mongoose
@@ -43,11 +44,40 @@ mongoose
 
 That's the basic structure for connecting to MongoDB. It is utilizing a `then` approach rather than sending a callback, and the response will be `conn`. The Mongo Atlas URL is sensitive information, so don't expose it in a public repo for bots to collect. This can be achieved with a private js file with .gitignore. 
 
-- mongoose.connect
-- create with users
-    - creating with faker.js
-    - auth note
-- 
+Seeding one collection will utilized with calling the Mongoose Model, and will also be utilizing faker for interesting seed data. Faker provides a library of flavorful dummy data, and a great way to interact with the database. 
+
+```javascript
+const mongoose = require("mongoose");
+let db = require("./keys.js").db
+const faker = require("faker");
+const User = require("../models/User");
+const { ObjectId } = mongoose.Types
+
+mongoose
+  .connect(db, { useNewUrlParser: true })
+  .then((conn) => {
+    // WARNING! This code below will delete the database. 
+    conn.connection.db.dropDatabase(
+      console.log(`${conn.connection.db.databaseName} database cleared.`)
+    );
+
+    let users = [];
+
+     for (let x = 0; x < 10; x++) {
+      newUser = {
+        _id: new ObjectId(x),
+        username: faker.internet.userName(),
+        email: faker.internet.email(),
+        password: "abc123",
+      };
+      users.push(newUser);
+    }   
+
+  })
+  .catch((err) => console.log(err));
+```
+
+Note the addition of `ObjectId`. Although ids are generated when it's processed by the database, 
 
 ## Seed File
 ```javascript
