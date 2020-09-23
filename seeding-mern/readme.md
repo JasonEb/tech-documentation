@@ -44,7 +44,7 @@ mongoose
 
 That's the basic structure for connecting to MongoDB. It is utilizing a `then` approach rather than sending a callback, and the response will be `conn`. The Mongo Atlas URL is sensitive information, so don't expose it in a public repo for bots to collect. This can be achieved with a private js file with .gitignore. 
 
-Seeding one collection will utilized with calling the Mongoose Model, and will also be utilizing faker for interesting seed data. Faker provides a library of flavorful dummy data, and a great way to interact with the database. 
+Seeding one collection will utilized with calling the Mongoose Model, and will also be utilizing faker for interesting seed data. Faker provides a library of flavorful dummy data, and a great way to  interact with the database. 
 
 ```javascript
 const mongoose = require("mongoose");
@@ -79,20 +79,25 @@ mongoose
   .catch((err) => console.log(err));
 ```
 
-Note that the MongoDB connection must remain active. A naive implementation would have the final calls be
+The MongoDB connection must remain active while updating the database. A naive implementation would have the final calls be
 ```javascript
 User.insertMany(users)
 mongoose.connection.close()
 ```
-But these are asynchronous functions executed consecutively, and thus mongoose will close the connection before the `insertMany` could interact with the database. Considering these are promises, the calls can be chained. 
+But these are asynchronous functions executed consecutively, and thus mongoose will close the connection before the `insertMany` could finish interacting with the database. Considering these are promises, the calls can be chained. 
 
-Note the addition of `ObjectId`. Although ids are generated when it's processed to the database, MongoDB will accept explicit id's as well. This is enabled by importing `ObjectId`, which will accept a string and assign a `_id` value. This will be useful when creating associated `Posts` with a nested reference. 
+Note the addition of `ObjectId`. Although ids are generated when it's processed to the database, MongoDB will accept explicit id's as well. This is enabled by importing `ObjectId`, which will accept a string and assign a `_id` value. This will be useful when generating associated `Posts` with a nested reference. 
 
-## Seed File
+```
+<Picture of Mongo Atlas Database>
+```
+
+Running the code should create a User collection on MongoAtlas. The ID's will still be obfuscated, but it will still be based on the initial string. Generating the associated `Post` data with a nested reference will be similar, but with one crucial difference. 
+
 ```javascript
 const faker = require("faker");
 const User = require("../models/User");
-const Tweet = require("../models/Tweet");
+const Post = require("../models/Post");
 const db = require("../config/keys").mongoURI;
 const mongoose = require("mongoose");
 const bcrypt = require("bcryptjs");
@@ -105,15 +110,17 @@ mongoose
   .then((conn) => {
     let users = [];
     let newUser = {};
-    let tweets = [];
+    let posts = [];
+    let newPost = {};
+    let randomuser = {};
 
     console.log(`Seed file connected to MongoDB successfully`);
 
     // WARNING! This code below will delete the database. 
-    // Uncomment to enable resetting the database each time the script is ran.
     conn.connection.db.dropDatabase(
-      console.log(`${conn.connection.db.databaseName} database dropped.`)
+      console.log(`${conn.connection.db.databaseName} database cleared.`)
     );
+    // disable for seed data to persist
     
     for (let x = 0; x < 10; x++) {
       newUser = {
@@ -126,15 +133,16 @@ mongoose
     }
 
     for (let y = 0; y < 100; y++) {
-      const newTweet = new Tweet({
+      randomUser = _.sample(users.map((user) => user._id))
+      newPost = new Post({
         _id: new ObjectId(y),
         text: faker.lorem.sentence(),
-        user: _.sample(users.map((user) => user._id)),
+        user: randomUser,
       });
-      tweets.push(newTweet);
+      posts.push(newPost);
     } 
 
-    let promises = [ User.insertMany(users), Tweet.insertMany(tweets) ]
+    let promises = [ User.insertMany(users), Post.insertMany(posts) ]
 
     Promise.all(promises).then ( () => mongoose.connection.close() )
   })
