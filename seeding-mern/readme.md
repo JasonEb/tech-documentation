@@ -1,14 +1,12 @@
-# Introduction
 
+---
+title: Seeding MongoDB Atlas with Nested References
+---
 Seeding is the process of creating systemic dummy data within a database, typically for testing purposes. A database filled wth data is great for interacting with data models and testing between 100s or 100000s of records. MongoDB is a NoSQL database, and relies on a "collection of documents" model to organize data.
 
-There are primarily two approaches when it comes to related models in MongoDB and Mongoose: `embedded Documents` and `nested reference`. Inserting data with nested references will be the focus of this article. Embedded documents allows related documents to be saved at the same time as parent. However a nested reference is a design approach that allows a child object to not be as coupled to the parent. In the case of a `User` and `Post` object, a Post object with a nested reference allows the Post collection to be more indepedent of the User collection, while preserving it's relationship.
+There are two approaches when it comes to connecting and relating models in MongoDB and Mongoose: `embedded Documents` and `nested references`. Inserting data with nested references will be the focus of this article. Embedded documents allows related documents to be saved at the same time as parent. However a nested reference is a design approach that allows a child object to not be as coupled to the parent. In the case of a `User` and `Post` object, a Post object with a nested reference allows the Post collection to be more indepedent of the User collection, while preserving it's relationship.
 
-The issue with seeding is respecting the MongoDB behavior when interacting with the database. MongoDB's designs it's [bulk writing API](https://docs.mongodb.com/manual/core/bulk-write-operations/) with one collection in mind, so seeding collections with nested references will require a coordinated approach.
-
-## Main Technologies
-
-- node.js, express, Mongodb, mongoose
+The issue with seeding is respecting the MongoDB behavior when interacting with the database. MongoDB's designs it's [bulk writing API](https://docs.mongodb.com/manual/core/bulk-write-operations/) with one collection in mind, so seeding collections with nested references will require a more coordinated approach.
 
 ### Project Data Models
 
@@ -122,11 +120,10 @@ mongoose
 
     console.log(`Seed file connected to MongoDB successfully`);
 
-    // WARNING! This code below will delete the database.
+    // WARNING! This code below will delete the named database.
     conn.connection.db.dropDatabase(
       console.log(`${conn.connection.db.databaseName} database cleared.`)
     );
-    // disable for seed data to persist
 
     for (let x = 0; x < 10; x++) {
       newUser = {
@@ -155,25 +152,35 @@ mongoose
   .catch((err) => console.log(err));
 ```
 
-Lodash's `sample` will pick a random user ID to assign to a Post. Of course, a simpler approach will suffice, but it's an excellent opportunity to test validations. The final couple lines of code introduces `Promise.all`, a method that will execute promises concurrently and wait for resolution. Chaining another `then` will work as well - the responses will return the confirmed data like `users` and `posts`. Ulizing a nested reference along with Promise.all is a flexible approach that's also performant.
+Lodash's `sample` will pick a random user ID to assign to a Post. Of course, a simpler approach will suffice, but it's an excellent opportunity to test validations and add more distinct data. The final couple lines of code introduces `Promise.all`, a method that will execute promises concurrently and wait for resolution. Chaining another `then` will work as well - the responses will return the confirmed data like `users` and `posts`. Utilizing a nested reference along with Promise.all doesn't introduce extra callbacks and is more performant because promises are executed in parallel. 
+
+## Conclusion
+This seeding file can be wrapped into a npm command by adding 
+```javascript
+    "scripts": {
+      "db:seed": "node seed.js "
+    }
+```
+
+Debugging is performed with `node inspect seed.js`. 
+With nested references, seeding MongoDB with Mongoose and Faker.js is a powerful approach for testing against the database.
+
+### Follow-Up Topics
+
+- Auth FLow
+- API Routes
+
+## Rough Draft
+- grammarly
+
+## Final Draft
+- grammarly
 
 ## Installation Instructions
 
 - git clone
 - setup config
   - keys
-  - passport should be included
-
-## MongoDB and Mongoose
-
-## Set up Mongo Atlas
-
-- manage keys
-- demonstrate different databases
-
-## Actual Seed File
-
-## Debugging
 
 # References
 
@@ -181,15 +188,4 @@ Lodash's `sample` will pick a random user ID to assign to a Post. Of course, a s
 - that one seeding article on dev.to
 - [What's New in Mongoose 5: Improved Connectionsn](http://thecodebarbarian.com/whats-new-in-mongoose-5-improved-connections.html)
 
-# Rough Draft
 
-- grammarly
-
-# Final Draft
-
-- grammarly
-
-## Follow-Up Topics
-
-- Auth FLow
-- API Routes
